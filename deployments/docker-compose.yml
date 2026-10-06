@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  flexiproxy:
+    build:
+      context: ..
+      dockerfile: deployments/Dockerfile
+    container_name: flexiproxy
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      - backend-1
+      - backend-2
+      - backend-3
+    networks:
+      - flexi-net
+    restart: unless-stopped
+
+  backend-1:
+    build:
+      context: ..
+      dockerfile: deployments/Dockerfile
+    container_name: backend-1
+    entrypoint: ["./backend-demo"]
+    command: ["--port", "8001", "--id", "backend-1"]
+    ports:
+      - "8001:8001"
+    networks:
+      - flexi-net
+    restart: unless-stopped
+
+  backend-2:
+    build:
+      context: ..
+      dockerfile: deployments/Dockerfile
+    container_name: backend-2
+    entrypoint: ["./backend-demo"]
+    command: ["--port", "8002", "--id", "backend-2"]
+    ports:
+      - "8002:8002"
+    networks:
+      - flexi-net
+    restart: unless-stopped
+
+  backend-3:
+    build:
+      context: ..
+      dockerfile: deployments/Dockerfile
+    container_name: backend-3
+    entrypoint: ["./backend-demo"]
+    command: ["--port", "8003", "--id", "backend-3"]
+    ports:
+      - "8003:8003"
+    networks:
+      - flexi-net
+    restart: unless-stopped
+
+networks:
+  flexi-net:
+    driver: bridge

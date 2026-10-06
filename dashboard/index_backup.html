@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlexiProxy - Real-Time Observability Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-card: #1e293b;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #38bdf8;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-amber: #f59e0b;
+            --accent-purple: #a855f7;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 24px;
+            line-height: 1.5;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .title-group { display: flex; align-items: center; gap: 12px; }
+        .logo { font-size: 24px; font-weight: 700; color: var(--accent-blue); letter-spacing: -0.5px; }
+        .badge {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent-blue);
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            border: 1px solid var(--border-color);
+        }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .card-label { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-bottom: 6px; }
+        .card-value { font-size: 28px; font-weight: 700; color: var(--text-primary); }
+        .card-subtext { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-container { grid-template-columns: 1fr; }
+        }
+
+        .chart-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .chart-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary); }
+        .chart-wrapper { position: relative; height: 260px; width: 100%; }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 12px 16px; border-bottom: 1px solid var(--border-color); font-size: 13px; }
+        th { color: var(--text-muted); font-weight: 600; background: rgba(15, 23, 42, 0.4); }
+        tbody tr:hover { background: rgba(51, 65, 85, 0.3); }
+
+        .tag-healthy { color: var(--accent-green); font-weight: 600; }
+        .tag-unhealthy { color: var(--accent-red); font-weight: 600; }
+        .code-font { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="title-group">
+            <div class="logo">FlexiProxy</div>
+            <div class="badge">Reverse Proxy & Load Balancer</div>
+        </div>
+        <div class="status-pill">
+            <div class="dot" id="live-dot"></div>
+            <span id="system-status">Operational</span>
+        </div>
+    </header>
+
+    <div class="metrics-grid">
+        <div class="card">
+            <div class="card-label">Total Requests</div>
+            <div class="card-value" id="total-reqs">0</div>
+            <div class="card-subtext">Lifetime processed</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Active Concurrency</div>
+            <div class="card-value" id="active-conns">0</div>
+            <div class="card-subtext">Requests in flight</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Healthy Backends</div>
+            <div class="card-value" id="healthy-backends">0 / 0</div>
+            <div class="card-subtext">Active targets</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Load Balancer</div>
+            <div class="card-value" id="lb-algorithm" style="font-size: 20px; text-transform: uppercase;">ROUND_ROBIN</div>
+            <div class="card-subtext">Routing strategy</div>
+        </div>
+    </div>
+
+    <div class="charts-container">
+        <div class="chart-card">
+            <div class="chart-title">Backend Moving Latency (ms)</div>
+            <div class="chart-wrapper">
+                <canvas id="latencyChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-title">Backend Concurrency Distribution</div>
+            <div class="chart-wrapper">
+                <canvas id="concurrencyChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="chart-card">
+        <div class="chart-title">Upstream Target Pool</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Address</th>
+                    <th>Health</th>
+                    <th>Circuit State</th>
+                    <th>Latency (ms)</th>
+                    <th>Active Conns</th>
+                    <th>Total Requests</th>
+                    <th>Weight</th>
+                </tr>
+            </thead>
+            <tbody id="backends-table-body">
+                <tr><td colspan="8" style="text-align: center; color: var(--text-muted);">Connecting to live event stream...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let latencyChart, concurrencyChart;
+
+        function initCharts() {
+            const ctxLatency = document.getElementById('latencyChart').getContext('2d');
+            latencyChart = new Chart(ctxLatency, {
+                type: 'line',
+                data: { labels: [], datasets: [] },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                        y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' }, beginAtZero: true }
+                    },
+                    plugins: { legend: { labels: { color: '#f8fafc' } } }
+                }
+            });
+
+            const ctxConn = document.getElementById('concurrencyChart').getContext('2d');
+            concurrencyChart = new Chart(ctxConn, {
+                type: 'doughnut',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: ['#38bdf8', '#22c55e', '#a855f7'] }] },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#f8fafc' } } }
+                }
+            });
+        }
+
+        function updateDashboard() {
+            fetch('/api/v1/status')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('healthy-backends').innerText = `${data.backends_healthy} / ${data.backends_total}`;
+                    document.getElementById('lb-algorithm').innerText = data.load_balancer_algorithm;
+                });
+
+            fetch('/api/v1/backends')
+                .then(res => res.json())
+                .then(backends => {
+                    const tbody = document.getElementById('backends-table-body');
+                    tbody.innerHTML = '';
+
+                    let totalReqs = 0;
+                    let totalConns = 0;
+                    const labels = [];
+                    const latencies = [];
+                    const conns = [];
+
+                    backends.forEach(b => {
+                        totalReqs += b.total_reqs || 0;
+                        totalConns += b.active_conns || 0;
+
+                        labels.push(b.id);
+                        const lat = b.latency_nano ? (b.latency_nano / 1000000).toFixed(2) : '0.00';
+                        latencies.push(lat);
+                        conns.push(b.active_conns || 0);
+
+                        const circuitStateStr = b.circuit_state === 0 ? 'CLOSED' : (b.circuit_state === 1 ? 'OPEN' : 'HALF_OPEN');
+                        const healthClass = b.healthy ? 'tag-healthy' : 'tag-unhealthy';
+                        const healthText = b.healthy ? 'UP' : 'DOWN';
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="code-font" style="font-weight:600;">${b.id}</td>
+                            <td class="code-font">${b.address}</td>
+                            <td class="${healthClass}">${healthText}</td>
+                            <td><span class="badge" style="background:rgba(255,255,255,0.05); color:#cbd5e1;">${circuitStateStr}</span></td>
+                            <td class="code-font">${lat} ms</td>
+                            <td class="code-font">${b.active_conns || 0}</td>
+                            <td class="code-font">${b.total_reqs || 0}</td>
+                            <td class="code-font">${b.weight}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+
+                    document.getElementById('total-reqs').innerText = totalReqs;
+                    document.getElementById('active-conns').innerText = totalConns;
+
+                    // Update charts
+                    concurrencyChart.data.labels = labels;
+                    concurrencyChart.data.datasets[0].data = conns;
+                    concurrencyChart.update();
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            updateDashboard();
+
+            // Connect real-time Server-Sent Events stream
+            const evtSource = new EventSource('/api/v1/events');
+            evtSource.onmessage = function(e) {
+                updateDashboard();
+            };
+            evtSource.onerror = function() {
+                document.getElementById('live-dot').style.background = '#ef4444';
+                document.getElementById('system-status').innerText = 'Connecting...';
+            };
+            evtSource.onopen = function() {
+                document.getElementById('live-dot').style.background = '#22c55e';
+                document.getElementById('system-status').innerText = 'Operational';
+            };
+
+            setInterval(updateDashboard, 1500);
+        });
+    </script>
+</body>
+</html>

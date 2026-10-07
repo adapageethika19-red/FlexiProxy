@@ -4,112 +4,89 @@
 
 ![Go Version](https://img.shields.io/badge/Go-1.22-00ADD8?style=flat&logo=go)
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
+![Deployment](https://img.shields.io/badge/Deployment-Render-purple)
+![Status](https://img.shields.io/badge/Status-Live-success)
 
 ---
 
-## Overview
+## 🚀 Live Deployment
 
-FlexiProxy is an open-source HTTP reverse proxy and load balancer built in Go. It sits between client applications and backend microservices, providing automated load distribution, active health probing, passive monitoring, circuit breaking, failover retries, Prometheus observability, and a real-time web dashboard.
+FlexiProxy is deployed as a publicly accessible cloud service.
 
-## System Architecture
+### 🌐 Live Proxy
+
+**https://flexiproxy-1j4q.onrender.com**
+
+### 📊 Live Monitoring Dashboard
+
+**https://flexiproxy-1j4q.onrender.com/dashboard/**
+
+The live dashboard provides real-time visibility into:
+
+- Proxy status
+- Backend server health
+- Request distribution
+- Response latency
+- Active connections
+- CPU and memory usage
+- Circuit breaker state
+- Load-balancing activity
+- Backend availability
+- Automatic failover
+
+> **No local installation is required to access the live deployment.**
+> The proxy and dashboard can be opened from any laptop or browser with an internet connection.
+
+---
+
+## 📖 Overview
+
+FlexiProxy is an open-source HTTP reverse proxy and load balancer built in Go.
+
+It sits between client applications and backend services and intelligently manages incoming HTTP traffic.
+
+Instead of allowing clients to communicate directly with a single backend server, requests first pass through FlexiProxy. The proxy then selects a healthy backend using the configured load-balancing strategy.
+
+FlexiProxy continuously monitors backend health and can automatically reroute traffic when a backend becomes unavailable.
+
+### Main Responsibilities
+
+1. Receive incoming client requests.
+2. Select an appropriate backend server.
+3. Forward the request to the selected backend.
+4. Monitor backend health and performance.
+5. Detect backend failures.
+6. Prevent traffic from being sent to unhealthy servers.
+7. Retry failed requests when appropriate.
+8. Automatically reroute traffic to healthy backends.
+9. Expose real-time monitoring and metrics.
+
+---
+
+## 🏗️ System Architecture
+
+### Production Architecture
 
 ```mermaid
 flowchart TD
-    Client["Client Traffic"] -->|HTTP Request| Proxy[":8080 FlexiProxy Engine"]
-    
-    subgraph FlexiProxy ["FlexiProxy Runtime"]
-        Proxy --> ReqID["X-Request-ID Middleware"]
-        ReqID --> LB["Load Balancer Engine"]
-        LB --> CB["Circuit Breaker Evaluation"]
-        CB --> Transport["Optimized Transport Pool"]
-        
-        subgraph Subsystems ["Background Subsystems"]
-            ActiveHealthCheck["Active Health Checker"]
-            PassiveMonitor["Passive Traffic Observer"]
-            MetricsCollector["Prometheus Exporter"]
-            AdminAPI[":8081 Admin API & Dashboard"]
-        end
+    Client["Client / Browser"] --> Proxy["FlexiProxy Cloud"]
 
-        Transport --> RetryLoop["Retry & Failover Controller"]
+    subgraph FlexiProxy["FlexiProxy Runtime"]
+        Proxy --> RequestID["Request ID Middleware"]
+        RequestID --> LB["Load Balancer"]
+        LB --> CB["Circuit Breaker"]
+        CB --> Health["Health Evaluation"]
+        Health --> Transport["HTTP Transport Pool"]
+        Transport --> Retry["Retry & Failover"]
     end
 
-    RetryLoop -->|HTTP Proxy Pass| B1["Backend 1 (:8001)"]
-    RetryLoop -->|HTTP Proxy Pass| B2["Backend 2 (:8002)"]
-    RetryLoop -->|HTTP Proxy Pass| B3["Backend 3 (:8003)"]
+    Retry --> B1["Backend 1"]
+    Retry --> B2["Backend 2"]
+    Retry --> B3["Backend 3"]
 
-    ActiveHealthCheck -->|Poll /health| B1
-    ActiveHealthCheck -->|Poll /health| B2
-    ActiveHealthCheck -->|Poll /health| B3
-```
+    Monitor["Monitoring Dashboard"] --> Admin["Admin API"]
+    Admin --> FlexiProxy
 
-## Features
-
-- **Real HTTP Reverse Proxy**: Preserves standard HTTP methods (`GET`, `POST`, `PUT`, `DELETE`, `PATCH`, `OPTIONS`, `HEAD`), query parameters, headers (`X-Forwarded-For`, `X-Forwarded-Proto`), and streaming responses without chunk buffering.
-- **Dynamic Load Balancing**:
-  - **Round Robin**: Sequential round-robin selection.
-  - **Weighted Round Robin**: Smooth weighted round-robin distribution.
-  - **Least Connections**: Prefers backends with the lowest active request concurrency.
-  - **Adaptive Resource-Aware**: Dynamic scoring based on latency, active connections, CPU/Memory, and error rates.
-- **Active Health Checking**: Background probing of `/health` endpoints with configurable thresholds.
-- **Passive Health Monitoring**: Real-time traffic observation for 5xx errors and connection failures.
-- **Circuit Breaking**: Concurrency-safe state transitions (`CLOSED`, `OPEN`, `HALF_OPEN`) per backend.
-- **Safe Retry & Failover**: RFC 7231 compliant idempotent retries and failure rerouting.
-- **Prometheus Observability**: `/metrics` endpoint exposing standard metrics.
-- **Real-Time Observability Dashboard**: Built-in web UI powered by Server-Sent Events (SSE) and Chart.js on `:8081/dashboard/`.
-
----
-
-## Quick Start
-
-### Local Development
-
-1. Build binaries:
-   ```bash
-   go build -o bin/flexiproxy ./cmd/flexiproxy
-   go build -o bin/backend-demo ./cmd/backend-demo
-   ```
-
-2. Start a backend demo server:
-   ```bash
-   ./bin/backend-demo --port 8001 --id backend-1
-   ```
-
-3. Start FlexiProxy:
-   ```bash
-   ./bin/flexiproxy --config configs/flexiproxy.yaml
-   ```
-
-4. Send traffic through proxy:
-   ```bash
-   curl http://localhost:8080/api/test
-   ```
-
-5. Open Dashboard:
-   [http://localhost:8081/dashboard/](http://localhost:8081/dashboard/)
-
----
-
-### Docker Compose Deployment
-
-```bash
-docker-compose -f deployments/docker-compose.yml up --build
-```
-
-Access:
-- **Proxy Port**: `http://localhost:8080`
-- **Dashboard & Admin API**: `http://localhost:8081/dashboard/`
-- **Prometheus Metrics**: `http://localhost:8081/metrics`
-
----
-
-## Running Unit & Integration Tests
-
-```bash
-go test -v ./...
-```
-
----
-
-## License
-
-FlexiProxy is open-source software licensed under the [Apache 2.0 License](LICENSE).
+    Health --> B1
+    Health --> B2
+    Health --> B3

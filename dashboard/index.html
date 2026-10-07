@@ -2,9 +2,7 @@
 <html lang="en" class="dark">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>FlexiProxy Enterprise - Observability & Control Center</title>
@@ -13,10 +11,8 @@
     <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
 
     <!-- Fonts -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
-        rel="stylesheet"
-    >
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -84,41 +80,32 @@
             background: #334155;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
+        table th {
             text-align: left;
             padding: 12px;
             font-size: 11px;
-            color: #64748b;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            color: #64748b;
         }
 
-        td {
+        table td {
             padding: 12px;
             font-size: 12px;
             color: #cbd5e1;
         }
 
-        .live-indicator {
-            animation: livePulse 1.5s infinite;
+        .traffic-active {
+            animation: trafficPulse 0.8s ease-in-out infinite alternate;
         }
 
-        @keyframes livePulse {
+        @keyframes trafficPulse {
 
-            0% {
-                opacity: 1;
+            from {
+                opacity: 0.6;
             }
 
-            50% {
-                opacity: 0.4;
-            }
-
-            100% {
+            to {
                 opacity: 1;
             }
         }
@@ -131,228 +118,297 @@
 <body class="min-h-screen flex flex-col md:flex-row antialiased">
 
 
-    <!-- ============================================================
-         SIDEBAR
-    ============================================================= -->
+<!-- ============================================================
+     SIDEBAR
+============================================================ -->
 
-    <aside
-        class="w-full md:w-64 bg-slate-900/90 border-r border-slate-800 p-5 flex flex-col justify-between shrink-0"
-    >
+<aside class="w-full md:w-64 bg-slate-900/90 border-r border-slate-800 p-5 flex flex-col justify-between shrink-0">
+
+    <div>
+
+        <!-- BRAND -->
+
+        <div class="flex items-center gap-3 mb-8">
+
+            <div
+                class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-sky-500/20">
+                F
+            </div>
+
+            <div>
+
+                <h1 class="font-bold text-lg leading-none text-white tracking-tight">
+                    FlexiProxy
+                </h1>
+
+                <span class="text-[11px] font-semibold text-sky-400 uppercase tracking-wider">
+                    v0.1.0 Enterprise
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- NAVIGATION -->
+
+        <nav class="space-y-1.5" id="nav-container">
+
+            <button onclick="switchTab('overview')" id="nav-overview"
+                class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-white bg-slate-800 border border-slate-700/60 shadow-sm">
+
+                <span class="text-sky-400">▦</span>
+                Overview
+
+            </button>
+
+
+            <button onclick="switchTab('targets')" id="nav-targets"
+                class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+
+                <span class="text-emerald-400">▣</span>
+                Target Pool
+
+            </button>
+
+
+            <button onclick="switchTab('circuit')" id="nav-circuit"
+                class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+
+                <span class="text-amber-400">⚡</span>
+                Circuit Breakers
+
+            </button>
+
+
+            <button onclick="switchTab('chaos')" id="nav-chaos"
+                class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+
+                <span class="text-rose-400">⚗</span>
+                Traffic & Chaos Testing
+
+            </button>
+
+
+            <button onclick="switchTab('logs')" id="nav-logs"
+                class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+
+                <span class="text-purple-400">›_</span>
+                Live Console Log
+
+            </button>
+
+
+            <button onclick="switchTab('config')" id="nav-config"
+                class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+
+                <span class="text-indigo-400">⚙</span>
+                Configuration
+
+            </button>
+
+        </nav>
+
+    </div>
+
+
+    <!-- CONNECTION STATUS -->
+
+    <div class="mt-8 p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+
+        <div class="flex items-center gap-2.5">
+
+            <div id="pulse-dot"
+                class="w-2.5 h-2.5 rounded-full bg-emerald-500 pulse-green">
+            </div>
+
+            <div>
+
+                <div id="status-text"
+                    class="text-xs font-bold text-slate-200">
+                    Operational
+                </div>
+
+                <div class="text-[10px] text-slate-400">
+                    Live Event Stream
+                </div>
+
+            </div>
+
+        </div>
+
+        <span id="port-label"
+            class="text-[10px] code-font text-sky-400 font-semibold px-2 py-0.5 rounded bg-sky-500/10 border border-sky-500/20">
+            CLOUD
+        </span>
+
+    </div>
+
+</aside>
+
+
+
+<!-- ============================================================
+     MAIN
+============================================================ -->
+
+<main class="flex-1 p-6 md:p-8 overflow-y-auto space-y-6">
+
+
+    <!-- HEADER -->
+
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800/80">
 
         <div>
 
-            <!-- BRAND -->
+            <h2 id="page-title"
+                class="text-2xl font-extrabold text-white tracking-tight">
+                Overview Dashboard
+            </h2>
 
-            <div class="flex items-center gap-3 mb-8">
+            <p class="text-xs text-slate-400 mt-1">
+                Real-time metrics, reverse proxy load balancer performance, and health observability.
+            </p>
 
-                <div
-                    class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-sky-500/20"
-                >
-                    F
-                </div>
+        </div>
 
-                <div>
 
-                    <h1 class="font-bold text-lg leading-none text-white tracking-tight">
-                        FlexiProxy
-                    </h1>
+        <div class="flex items-center gap-3">
 
-                    <span class="text-[11px] font-semibold text-sky-400 uppercase tracking-wider">
-                        v0.1.0 Enterprise
+            <button onclick="sendTestTraffic(5)"
+                class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 transition-all shadow-lg shadow-sky-500/20">
+
+                ⚡ Send 5 Test Requests
+
+            </button>
+
+
+            <button onclick="fetchData()"
+                class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">
+
+                🔄 Refresh
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ========================================================
+         KPI CARDS
+    ======================================================== -->
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+
+        <div class="glass-panel p-5 rounded-2xl">
+
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                Total Requests
+            </div>
+
+            <div id="kpi-total-reqs"
+                class="text-3xl font-extrabold text-white">
+                0
+            </div>
+
+            <div class="text-xs text-slate-500 mt-1.5">
+                Processed lifetime
+            </div>
+
+        </div>
+
+
+
+        <div class="glass-panel p-5 rounded-2xl">
+
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                Active Concurrency
+            </div>
+
+            <div id="kpi-active-conns"
+                class="text-3xl font-extrabold text-sky-400">
+                0
+            </div>
+
+            <div class="text-xs text-slate-500 mt-1.5">
+                Requests in flight
+            </div>
+
+        </div>
+
+
+
+        <div class="glass-panel p-5 rounded-2xl">
+
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                Healthy Target Ratio
+            </div>
+
+            <div id="kpi-healthy-ratio"
+                class="text-3xl font-extrabold text-emerald-400">
+                0 / 0
+            </div>
+
+            <div class="text-xs text-slate-500 mt-1.5">
+                Active backends
+            </div>
+
+        </div>
+
+
+
+        <div class="glass-panel p-5 rounded-2xl">
+
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                Routing Strategy
+            </div>
+
+            <div id="kpi-algorithm"
+                class="text-xl font-extrabold text-indigo-400 uppercase truncate mt-1">
+                ROUND_ROBIN
+            </div>
+
+            <div class="text-xs text-slate-500 mt-1.5">
+                Active Load Balancer
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ========================================================
+         OVERVIEW
+    ======================================================== -->
+
+    <div id="tab-overview-panel" class="space-y-6">
+
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+
+            <!-- LATENCY -->
+
+            <div class="lg:col-span-2 glass-panel p-5 rounded-2xl">
+
+                <div class="flex items-center justify-between mb-4">
+
+                    <h3 class="text-sm font-bold text-slate-200">
+                        Moving Latency Trend (ms)
+                    </h3>
+
+                    <span class="text-xs text-slate-400 code-font">
+                        Per-backend target
                     </span>
 
                 </div>
 
-            </div>
-
-
-            <!-- NAVIGATION -->
-
-            <nav class="space-y-1.5">
-
-                <button
-                    onclick="switchTab('overview')"
-                    id="nav-overview"
-                    class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-white bg-slate-800 border border-slate-700/60 shadow-sm"
-                >
-                    📊
-                    Overview
-                </button>
-
-
-                <button
-                    onclick="switchTab('targets')"
-                    id="nav-targets"
-                    class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
-                >
-                    🗄️
-                    Target Pool
-                </button>
-
-
-                <button
-                    onclick="switchTab('circuit')"
-                    id="nav-circuit"
-                    class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
-                >
-                    ⚡
-                    Circuit Breakers
-                </button>
-
-
-                <button
-                    onclick="switchTab('chaos')"
-                    id="nav-chaos"
-                    class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
-                >
-                    🧪
-                    Traffic & Chaos Testing
-                </button>
-
-
-                <button
-                    onclick="switchTab('logs')"
-                    id="nav-logs"
-                    class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
-                >
-                    💻
-                    Live Console Log
-                </button>
-
-
-                <button
-                    onclick="switchTab('config')"
-                    id="nav-config"
-                    class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
-                >
-                    ⚙️
-                    Configuration
-                </button>
-
-            </nav>
-
-        </div>
-
-
-        <!-- CONNECTION STATUS -->
-
-        <div
-            class="mt-8 p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between"
-        >
-
-            <div class="flex items-center gap-2.5">
-
-                <div
-                    id="pulse-dot"
-                    class="w-2.5 h-2.5 rounded-full bg-emerald-500 pulse-green"
-                ></div>
-
-                <div>
-
-                    <div
-                        class="text-xs font-bold text-slate-200"
-                        id="status-text"
-                    >
-                        Connecting...
-                    </div>
-
-                    <div class="text-[10px] text-slate-400">
-                        Live API Monitoring
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <span
-                class="text-[10px] code-font text-sky-400 font-semibold px-2 py-0.5 rounded bg-sky-500/10 border border-sky-500/20"
-            >
-                LIVE
-            </span>
-
-        </div>
-
-    </aside>
-
-
-
-    <!-- ============================================================
-         MAIN CONTENT
-    ============================================================= -->
-
-    <main class="flex-1 p-6 md:p-8 overflow-y-auto space-y-6">
-
-
-        <!-- HEADER -->
-
-        <div
-            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800/80"
-        >
-
-            <div>
-
-                <h2
-                    class="text-2xl font-extrabold text-white tracking-tight"
-                    id="page-title"
-                >
-                    Overview Dashboard
-                </h2>
-
-                <p class="text-xs text-slate-400 mt-1">
-                    Real-time metrics, reverse proxy load balancer performance, and health observability.
-                </p>
-
-            </div>
-
-
-            <div class="flex items-center gap-3">
-
-                <button
-                    onclick="sendTestTraffic(5)"
-                    class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 transition-all shadow-lg shadow-sky-500/20"
-                >
-                    ⚡ Send 5 Test Requests
-                </button>
-
-
-                <button
-                    onclick="fetchData()"
-                    class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all"
-                >
-                    🔄 Refresh
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- ============================================================
-             KPI CARDS
-        ============================================================= -->
-
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-
-
-            <!-- TOTAL REQUESTS -->
-
-            <div class="glass-panel p-5 rounded-2xl">
-
-                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                    Total Requests
-                </div>
-
-                <div
-                    class="text-3xl font-extrabold text-white"
-                    id="kpi-total-reqs"
-                >
-                    0
-                </div>
-
-                <div class="text-xs text-slate-500 mt-1.5">
-                    🔵 Processed lifetime
+                <div class="h-64">
+                    <canvas id="latencyChart"></canvas>
                 </div>
 
             </div>
@@ -362,460 +418,21 @@
 
             <div class="glass-panel p-5 rounded-2xl">
 
-                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                    Active Concurrency
-                </div>
-
-                <div
-                    class="text-3xl font-extrabold text-sky-400"
-                    id="kpi-active-conns"
-                >
-                    0
-                </div>
-
-                <div class="text-xs text-slate-500 mt-1.5">
-                    🟢 Requests in flight
-                </div>
-
-            </div>
-
-
-            <!-- HEALTH -->
-
-            <div class="glass-panel p-5 rounded-2xl">
-
-                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                    Healthy Target Ratio
-                </div>
-
-                <div
-                    class="text-3xl font-extrabold text-emerald-400"
-                    id="kpi-healthy-ratio"
-                >
-                    0 / 0
-                </div>
-
-                <div class="text-xs text-slate-500 mt-1.5">
-                    🟢 Active backends
-                </div>
-
-            </div>
-
-
-            <!-- ALGORITHM -->
-
-            <div class="glass-panel p-5 rounded-2xl">
-
-                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                    Routing Strategy
-                </div>
-
-                <div
-                    class="text-xl font-extrabold text-indigo-400 uppercase tracking-tight"
-                    id="kpi-algorithm"
-                >
-                    ROUND_ROBIN
-                </div>
-
-                <div class="text-xs text-slate-500 mt-1.5">
-                    🟣 Active Load Balancer
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- ============================================================
-             OVERVIEW
-        ============================================================= -->
-
-        <div id="tab-overview-panel" class="space-y-6">
-
-
-            <!-- CHARTS -->
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-
-                <!-- LATENCY -->
-
-                <div class="lg:col-span-2 glass-panel p-5 rounded-2xl">
-
-                    <div class="flex items-center justify-between mb-4">
-
-                        <h3 class="text-sm font-bold text-slate-200">
-                            Moving Latency Trend (ms)
-                        </h3>
-
-                        <span class="text-xs text-slate-400 code-font">
-                            Live
-                        </span>
-
-                    </div>
-
-                    <div class="h-64">
-
-                        <canvas id="latencyChart"></canvas>
-
-                    </div>
-
-                </div>
-
-
-                <!-- CONCURRENCY -->
-
-                <div class="glass-panel p-5 rounded-2xl">
-
-                    <div class="flex items-center justify-between mb-4">
-
-                        <h3 class="text-sm font-bold text-slate-200">
-                            Concurrency Share
-                        </h3>
-
-                        <span class="text-xs text-slate-400 code-font">
-                            In-flight
-                        </span>
-
-                    </div>
-
-                    <div class="h-64 flex items-center justify-center">
-
-                        <canvas id="concurrencyChart"></canvas>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- TARGET STATUS -->
-
-            <div class="glass-panel rounded-2xl p-5">
-
-                <h3 class="text-sm font-bold text-slate-200 mb-4">
-                    Upstream Target Status Overview
-                </h3>
-
-                <div class="overflow-x-auto">
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-
-                                <th>Target ID</th>
-                                <th>Address</th>
-                                <th>Health</th>
-                                <th>Circuit State</th>
-                                <th>Latency</th>
-                                <th>Concurrency</th>
-                                <th>Total Reqs</th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody
-                            id="overview-tbody"
-                            class="divide-y divide-slate-800/60"
-                        >
-
-                            <tr>
-
-                                <td
-                                    colspan="7"
-                                    class="text-center py-6 text-slate-500 text-xs"
-                                >
-                                    Loading...
-                                </td>
-
-                            </tr>
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- ============================================================
-             TARGET POOL
-        ============================================================= -->
-
-        <div
-            id="tab-targets-panel"
-            class="hidden space-y-6"
-        >
-
-            <div class="glass-panel rounded-2xl p-5">
-
-                <div class="flex items-center justify-between mb-4">
-
-                    <div>
-
-                        <h3 class="text-sm font-bold text-slate-200">
-                            Configured Upstream Targets
-                        </h3>
-
-                        <p class="text-xs text-slate-400">
-                            Live backend monitoring.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="overflow-x-auto">
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-
-                                <th>ID</th>
-                                <th>Address</th>
-                                <th>Weight</th>
-                                <th>Health</th>
-                                <th>Latency</th>
-                                <th>Active</th>
-                                <th>Total</th>
-                                <th>Actions</th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody
-                            id="targets-tbody"
-                            class="divide-y divide-slate-800/60"
-                        >
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- ============================================================
-             CIRCUIT BREAKERS
-        ============================================================= -->
-
-        <div
-            id="tab-circuit-panel"
-            class="hidden space-y-6"
-        >
-
-            <div class="glass-panel rounded-2xl p-5">
-
-                <div class="mb-4">
-
-                    <h3 class="text-sm font-bold text-slate-200">
-                        Circuit Breakers Monitor
-                    </h3>
-
-                    <p class="text-xs text-slate-400 mt-1">
-                        CLOSED → OPEN → HALF_OPEN
-                    </p>
-
-                </div>
-
-
-                <div class="overflow-x-auto">
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-
-                                <th>Target ID</th>
-                                <th>Address</th>
-                                <th>State</th>
-                                <th>Health</th>
-                                <th>Failures</th>
-                                <th>Threshold</th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody
-                            id="circuit-tbody"
-                            class="divide-y divide-slate-800/60"
-                        >
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- ============================================================
-             TRAFFIC / CHAOS
-        ============================================================= -->
-
-        <div
-            id="tab-chaos-panel"
-            class="hidden space-y-6"
-        >
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-
-                <!-- TRAFFIC -->
-
-                <div class="glass-panel p-5 rounded-2xl space-y-4">
-
-                    <div class="text-sky-400 font-bold text-sm">
-                        ⚡ Traffic Generator
-                    </div>
-
-                    <p class="text-xs text-slate-400">
-                        Send traffic through the live FlexiProxy deployment.
-                    </p>
-
-                    <button
-                        onclick="sendTestTraffic(10)"
-                        class="w-full py-2.5 text-xs font-semibold rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold"
-                    >
-                        🚀 Send 10 Requests
-                    </button>
-
-                    <button
-                        onclick="sendTestTraffic(50)"
-                        class="w-full py-2.5 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-400 border border-sky-500/30"
-                    >
-                        ⚡ Send 50 Burst Requests
-                    </button>
-
-                </div>
-
-
-                <!-- LATENCY -->
-
-                <div class="glass-panel p-5 rounded-2xl space-y-4">
-
-                    <div class="text-amber-400 font-bold text-sm">
-                        ⏱️ Latency & Error Testing
-                    </div>
-
-                    <p class="text-xs text-slate-400">
-                        Test slow responses and HTTP errors.
-                    </p>
-
-                    <button
-                        onclick="triggerSlowRequest()"
-                        class="w-full py-2.5 text-xs font-semibold rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                    >
-                        ⏱️ Request /slow
-                    </button>
-
-                    <button
-                        onclick="triggerErrorRequest()"
-                        class="w-full py-2.5 text-xs font-semibold rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/30"
-                    >
-                        💥 Request /error
-                    </button>
-
-                </div>
-
-
-                <!-- CLOUD NOTE -->
-
-                <div class="glass-panel p-5 rounded-2xl space-y-4">
-
-                    <div class="text-rose-400 font-bold text-sm">
-                        🔴 Backend Fault Testing
-                    </div>
-
-                    <p class="text-xs text-slate-400">
-
-                        Backend fault injection is available only
-                        when the backend control endpoint is exposed
-                        securely through the FlexiProxy Admin API.
-
-                    </p>
-
-                    <div
-                        class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20"
-                    >
-
-                        <div class="text-xs text-amber-300 font-semibold">
-                            Cloud deployment
-                        </div>
-
-                        <div class="text-[11px] text-slate-400 mt-1">
-                            Backend containers are private to Render.
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- ============================================================
-             LIVE LOGS
-        ============================================================= -->
-
-        <div
-            id="tab-logs-panel"
-            class="hidden space-y-6"
-        >
-
-            <div class="glass-panel p-5 rounded-2xl">
-
                 <div class="flex items-center justify-between mb-4">
 
                     <h3 class="text-sm font-bold text-slate-200">
-                        Real-Time Proxy Request Console
+                        Concurrency Share
                     </h3>
 
-                    <span
-                        class="text-xs text-emerald-400 code-font px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20"
-                    >
-                        LIVE
+                    <span class="text-xs text-slate-400 code-font">
+                        In-flight
                     </span>
 
                 </div>
 
+                <div class="h-64 flex items-center justify-center">
 
-                <div
-                    id="console-stream"
-                    class="bg-slate-950 border border-slate-800 rounded-xl p-4 h-96 overflow-y-auto code-font text-xs space-y-2"
-                >
-
-                    <div class="text-slate-500">
-                        [SYSTEM] FlexiProxy Live Console initialized...
-                    </div>
+                    <canvas id="concurrencyChart"></canvas>
 
                 </div>
 
@@ -825,1223 +442,1678 @@
 
 
 
-        <!-- ============================================================
-             CONFIGURATION
-        ============================================================= -->
+        <!-- OVERVIEW TABLE -->
 
-        <div
-            id="tab-config-panel"
-            class="hidden space-y-6"
-        >
+        <div class="glass-panel rounded-2xl p-5">
 
-            <div class="glass-panel p-5 rounded-2xl">
+            <h3 class="text-sm font-bold text-slate-200 mb-4">
+                Upstream Target Status Overview
+            </h3>
 
-                <h3 class="text-sm font-bold text-slate-200 mb-4">
-                    Active Configuration
-                </h3>
+            <div class="overflow-x-auto">
 
-                <pre
-                    id="config-code-block"
-                    class="bg-slate-950 border border-slate-800 rounded-xl p-5 code-font text-xs text-sky-400 overflow-x-auto leading-relaxed"
-                >
-Loading configuration...
-                </pre>
+                <table class="w-full">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Target ID</th>
+                            <th>Address</th>
+                            <th>Health</th>
+                            <th>Circuit State</th>
+                            <th>Latency</th>
+                            <th>Concurrency</th>
+                            <th>Total Reqs</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="overview-tbody">
+
+                        <tr>
+                            <td colspan="7"
+                                class="text-center py-6 text-slate-500">
+                                Loading...
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
 
             </div>
 
         </div>
 
-    </main>
+    </div>
 
 
 
-    <!-- ============================================================
-         JAVASCRIPT
-    ============================================================= -->
+    <!-- ========================================================
+         TARGETS
+    ======================================================== -->
 
-    <script>
+    <div id="tab-targets-panel"
+        class="hidden space-y-6">
 
-        let latencyChart;
-        let concurrencyChart;
+        <div class="glass-panel rounded-2xl p-5">
 
-        let updateInProgress = false;
+            <div class="flex items-center justify-between mb-4">
+
+                <div>
+
+                    <h3 class="text-sm font-bold text-slate-200">
+                        Configured Upstream Targets
+                    </h3>
+
+                    <p class="text-xs text-slate-400">
+                        Backend health and traffic metrics.
+                    </p>
+
+                </div>
+
+                <button onclick="fetchData()"
+                    class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 border border-slate-700">
+
+                    Refresh Data
+
+                </button>
+
+            </div>
 
 
-        // ============================================================
-        // API FETCH
-        // ============================================================
+            <div class="overflow-x-auto">
 
-        function apiFetch(url, options = {}) {
+                <table class="w-full">
 
-            const separator =
-                url.includes('?') ? '&' : '?';
+                    <thead>
 
-            return fetch(
-                url + separator + '_t=' + Date.now(),
+                        <tr>
+
+                            <th>ID</th>
+                            <th>Address</th>
+                            <th>Weight</th>
+                            <th>Health</th>
+                            <th>Latency</th>
+                            <th>Active</th>
+                            <th>Total</th>
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="targets-tbody"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ========================================================
+         CIRCUIT BREAKERS
+    ======================================================== -->
+
+    <div id="tab-circuit-panel"
+        class="hidden space-y-6">
+
+        <div class="glass-panel rounded-2xl p-5">
+
+            <h3 class="text-sm font-bold text-slate-200 mb-4">
+                Circuit Breakers Monitor
+            </h3>
+
+            <div class="overflow-x-auto">
+
+                <table class="w-full">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Target ID</th>
+                            <th>Address</th>
+                            <th>State</th>
+                            <th>Health</th>
+                            <th>Failures</th>
+                            <th>Threshold</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="circuit-tbody"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ========================================================
+         CHAOS / TRAFFIC
+    ======================================================== -->
+
+    <div id="tab-chaos-panel"
+        class="hidden space-y-6">
+
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+
+            <!-- TRAFFIC -->
+
+            <div class="glass-panel p-5 rounded-2xl space-y-4">
+
+                <div class="text-sky-400 font-bold text-sm">
+                    ⚡ Traffic Generator
+                </div>
+
+                <p class="text-xs text-slate-400">
+                    Send requests through the deployed FlexiProxy load balancer.
+                </p>
+
+
+                <button onclick="sendTestTraffic(10)"
+                    class="w-full py-2.5 text-xs font-semibold rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950">
+
+                    🚀 Send 10 Requests
+
+                </button>
+
+
+                <button onclick="sendTestTraffic(50)"
+                    class="w-full py-2.5 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-400 border border-sky-500/30">
+
+                    ⚡ Send 50 Burst Requests
+
+                </button>
+
+            </div>
+
+
+
+            <!-- LATENCY -->
+
+            <div class="glass-panel p-5 rounded-2xl space-y-4">
+
+                <div class="text-amber-400 font-bold text-sm">
+                    ⏱ Latency & Error Injection
+                </div>
+
+                <p class="text-xs text-slate-400">
+                    Test latency and error handling.
+                </p>
+
+
+                <button onclick="triggerSlowRequest()"
+                    class="w-full py-2.5 text-xs font-semibold rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30">
+
+                    ⏱️ Request /slow
+
+                </button>
+
+
+                <button onclick="triggerErrorRequest()"
+                    class="w-full py-2.5 text-xs font-semibold rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/30">
+
+                    💥 Request /error
+
+                </button>
+
+            </div>
+
+
+
+            <!-- FAULT -->
+
+            <div class="glass-panel p-5 rounded-2xl space-y-4">
+
+                <div class="text-rose-400 font-bold text-sm">
+                    🔴 Fault Injection
+                </div>
+
+                <p class="text-xs text-slate-400">
+                    Test backend health detection.
+                </p>
+
+
+                <button onclick="toggleBackendFault('http://localhost:8001','down')"
+                    class="w-full py-2.5 text-xs font-semibold rounded-xl bg-rose-600 text-white">
+
+                    🔴 Mark Backend 1 DOWN
+
+                </button>
+
+
+                <button onclick="toggleBackendFault('http://localhost:8001','up')"
+                    class="w-full py-2.5 text-xs font-semibold rounded-xl bg-emerald-600 text-white">
+
+                    🟢 Restore Backend 1 UP
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ========================================================
+         LOGS
+    ======================================================== -->
+
+    <div id="tab-logs-panel"
+        class="hidden space-y-6">
+
+        <div class="glass-panel p-5 rounded-2xl">
+
+            <div class="flex items-center justify-between mb-4">
+
+                <h3 class="text-sm font-bold text-slate-200">
+                    Real-Time Proxy Request Console
+                </h3>
+
+                <span class="text-xs text-sky-400 code-font">
+                    LIVE
+                </span>
+
+            </div>
+
+
+            <div id="console-stream"
+                class="bg-slate-950 border border-slate-800 rounded-xl p-4 h-96 overflow-y-auto code-font text-xs space-y-2">
+
+                <div class="text-slate-500">
+                    [SYSTEM] FlexiProxy Live Console initialized.
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ========================================================
+         CONFIG
+    ======================================================== -->
+
+    <div id="tab-config-panel"
+        class="hidden space-y-6">
+
+        <div class="glass-panel p-5 rounded-2xl">
+
+            <h3 class="text-sm font-bold text-slate-200 mb-4">
+                Active Configuration
+            </h3>
+
+            <pre id="config-code-block"
+                class="bg-slate-950 border border-slate-800 rounded-xl p-5 code-font text-xs text-sky-400 overflow-x-auto leading-relaxed">
+Loading configuration...
+            </pre>
+
+        </div>
+
+    </div>
+
+
+</main>
+
+
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+
+<script>
+
+let latencyChart;
+let concurrencyChart;
+
+
+/* ============================================================
+   CHARTS
+============================================================ */
+
+function initCharts() {
+
+    const latencyCanvas =
+        document.getElementById('latencyChart');
+
+    const concurrencyCanvas =
+        document.getElementById('concurrencyChart');
+
+
+    latencyChart = new Chart(
+        latencyCanvas.getContext('2d'),
+        {
+            type: 'line',
+
+            data: {
+                labels: [],
+
+                datasets: [{
+                    label: 'Latency (ms)',
+                    data: [],
+                    borderColor: '#38bdf8',
+                    backgroundColor: 'rgba(56,189,248,0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+
+            options: {
+
+                responsive: true,
+                maintainAspectRatio: false,
+
+                scales: {
+
+                    x: {
+                        grid: {
+                            color: 'rgba(255,255,255,0.05)'
+                        },
+
+                        ticks: {
+                            color: '#64748b'
+                        }
+                    },
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        grid: {
+                            color: 'rgba(255,255,255,0.05)'
+                        },
+
+                        ticks: {
+                            color: '#64748b'
+                        }
+                    }
+
+                },
+
+                plugins: {
+
+                    legend: {
+
+                        labels: {
+                            color: '#94a3b8'
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+
+    concurrencyChart = new Chart(
+        concurrencyCanvas.getContext('2d'),
+        {
+            type: 'doughnut',
+
+            data: {
+
+                labels: [],
+
+                datasets: [{
+
+                    data: [],
+
+                    backgroundColor: [
+                        '#38bdf8',
+                        '#10b981',
+                        '#8b5cf6',
+                        '#f59e0b'
+                    ]
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+
+                        labels: {
+                            color: '#94a3b8'
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+
+/* ============================================================
+   TAB SWITCHING
+============================================================ */
+
+function switchTab(tabName) {
+
+    const tabs = [
+        'overview',
+        'targets',
+        'circuit',
+        'chaos',
+        'logs',
+        'config'
+    ];
+
+
+    tabs.forEach(function(tab) {
+
+        const button =
+            document.getElementById('nav-' + tab);
+
+        const panel =
+            document.getElementById('tab-' + tab + '-panel');
+
+
+        if (tab === tabName) {
+
+            button.className =
+                'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-white bg-slate-800 border border-slate-700/60 shadow-sm';
+
+            panel.classList.remove('hidden');
+
+        } else {
+
+            button.className =
+                'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/50';
+
+            panel.classList.add('hidden');
+
+        }
+
+    });
+
+
+    const titles = {
+
+        overview: 'Overview Dashboard',
+
+        targets: 'Upstream Target Pool',
+
+        circuit: 'Circuit Breakers Monitor',
+
+        chaos: 'Traffic & Chaos Control Center',
+
+        logs: 'Live Console Stream',
+
+        config: 'Runtime Configuration'
+
+    };
+
+
+    document.getElementById('page-title').innerText =
+        titles[tabName] || 'Dashboard';
+
+}
+
+
+
+/* ============================================================
+   FETCH STATUS
+============================================================ */
+
+async function fetchStatus() {
+
+    try {
+
+        const response =
+            await fetch(
+                '/api/v1/status',
                 {
+                    cache: 'no-store'
+                }
+            );
+
+
+        if (!response.ok) {
+            throw new Error('Status API failed');
+        }
+
+
+        const data =
+            await response.json();
+
+
+        document.getElementById(
+            'kpi-healthy-ratio'
+        ).innerText =
+            data.backends_healthy +
+            ' / ' +
+            data.backends_total;
+
+
+        document.getElementById(
+            'kpi-algorithm'
+        ).innerText =
+            data.load_balancer_algorithm || 'UNKNOWN';
+
+
+        setConnectionStatus(true);
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        setConnectionStatus(false);
+
+    }
+
+}
+
+
+
+/* ============================================================
+   FETCH CONFIG
+============================================================ */
+
+async function fetchConfig() {
+
+    try {
+
+        const response =
+            await fetch(
+                '/api/v1/config',
+                {
+                    cache: 'no-store'
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        document.getElementById(
+            'config-code-block'
+        ).innerText =
+            JSON.stringify(data, null, 2);
+
+    }
+
+    catch (error) {
+
+        document.getElementById(
+            'config-code-block'
+        ).innerText =
+            'Unable to load configuration.';
+
+    }
+
+}
+
+
+
+/* ============================================================
+   FETCH BACKENDS
+============================================================ */
+
+async function fetchBackends() {
+
+    try {
+
+        const response =
+            await fetch(
+                '/api/v1/backends',
+                {
+                    cache: 'no-store'
+                }
+            );
+
+
+        if (!response.ok) {
+            throw new Error('Backend API failed');
+        }
+
+
+        const backends =
+            await response.json();
+
+
+        let totalRequests = 0;
+        let totalConnections = 0;
+
+
+        const labels = [];
+        const latencies = [];
+        const connections = [];
+
+
+        const overview =
+            document.getElementById(
+                'overview-tbody'
+            );
+
+        const targets =
+            document.getElementById(
+                'targets-tbody'
+            );
+
+        const circuit =
+            document.getElementById(
+                'circuit-tbody'
+            );
+
+
+        overview.innerHTML = '';
+        targets.innerHTML = '';
+        circuit.innerHTML = '';
+
+
+        backends.forEach(function(backend) {
+
+
+            /* ---------------------------------------------
+               METRICS
+            --------------------------------------------- */
+
+            totalRequests +=
+                Number(
+                    backend.total_reqs || 0
+                );
+
+
+            totalConnections +=
+                Number(
+                    backend.active_conns || 0
+                );
+
+
+            labels.push(
+                backend.id
+            );
+
+
+            /*
+             * IMPORTANT:
+             * API returns latency_ms.
+             */
+
+            const latency =
+                Number(
+                    backend.latency_ms || 0
+                );
+
+
+            latencies.push(
+                latency
+            );
+
+
+            connections.push(
+                Number(
+                    backend.active_conns || 0
+                )
+            );
+
+
+            /* ---------------------------------------------
+               HEALTH
+            --------------------------------------------- */
+
+            const isHealthy =
+                backend.healthy === true;
+
+
+            const healthTag =
+                isHealthy
+
+                ?
+
+                '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">UP</span>'
+
+                :
+
+                '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">DOWN</span>';
+
+
+            /* ---------------------------------------------
+               CIRCUIT
+            --------------------------------------------- */
+
+            const circuitState =
+                Number(
+                    backend.circuit_state || 0
+                );
+
+
+            let circuitTag =
+                '<span class="px-2 py-0.5 rounded text-[11px] font-bold code-font bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">CLOSED</span>';
+
+
+            if (circuitState === 1) {
+
+                circuitTag =
+                    '<span class="px-2 py-0.5 rounded text-[11px] font-bold code-font bg-rose-500/10 text-rose-400 border border-rose-500/20">OPEN</span>';
+
+            }
+
+
+            if (circuitState === 2) {
+
+                circuitTag =
+                    '<span class="px-2 py-0.5 rounded text-[11px] font-bold code-font bg-amber-500/10 text-amber-400 border border-amber-500/20">HALF_OPEN</span>';
+
+            }
+
+
+
+            /* ---------------------------------------------
+               OVERVIEW TABLE
+            --------------------------------------------- */
+
+            overview.innerHTML += `
+
+                <tr>
+
+                    <td class="code-font font-bold text-sky-400">
+                        ${backend.id}
+                    </td>
+
+                    <td class="code-font text-slate-300">
+                        ${backend.address}
+                    </td>
+
+                    <td>
+                        ${healthTag}
+                    </td>
+
+                    <td>
+                        ${circuitTag}
+                    </td>
+
+                    <td class="code-font">
+                        ${latency.toFixed(2)} ms
+                    </td>
+
+                    <td class="code-font">
+                        ${backend.active_conns || 0}
+                    </td>
+
+                    <td class="code-font">
+                        ${backend.total_reqs || 0}
+                    </td>
+
+                </tr>
+
+            `;
+
+
+
+            /* ---------------------------------------------
+               TARGET TABLE
+            --------------------------------------------- */
+
+            targets.innerHTML += `
+
+                <tr>
+
+                    <td class="code-font font-bold text-sky-400">
+                        ${backend.id}
+                    </td>
+
+                    <td class="code-font text-slate-300">
+                        ${backend.address}
+                    </td>
+
+                    <td class="code-font">
+                        ${backend.weight || 1}
+                    </td>
+
+                    <td>
+                        ${healthTag}
+                    </td>
+
+                    <td class="code-font">
+                        ${latency.toFixed(2)} ms
+                    </td>
+
+                    <td class="code-font">
+                        ${backend.active_conns || 0}
+                    </td>
+
+                    <td class="code-font">
+                        ${backend.total_reqs || 0}
+                    </td>
+
+                    <td>
+
+                        <button
+                            onclick="probeBackend('${backend.address}')"
+                            class="px-2.5 py-1 text-xs font-semibold rounded bg-slate-800 text-sky-400 border border-sky-500/20 hover:bg-slate-700">
+
+                            Probe
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+
+
+            /* ---------------------------------------------
+               CIRCUIT TABLE
+            --------------------------------------------- */
+
+            circuit.innerHTML += `
+
+                <tr>
+
+                    <td class="code-font font-bold text-sky-400">
+                        ${backend.id}
+                    </td>
+
+                    <td class="code-font text-slate-300">
+                        ${backend.address}
+                    </td>
+
+                    <td>
+                        ${circuitTag}
+                    </td>
+
+                    <td>
+                        ${healthTag}
+                    </td>
+
+                    <td class="code-font">
+                        ${backend.failed_reqs || 0}
+                    </td>
+
+                    <td class="code-font text-slate-400">
+                        5 consecutive
+                    </td>
+
+                </tr>
+
+            `;
+
+        });
+
+
+
+        /* ---------------------------------------------
+           KPI
+        --------------------------------------------- */
+
+        document.getElementById(
+            'kpi-total-reqs'
+        ).innerText =
+            totalRequests;
+
+
+        document.getElementById(
+            'kpi-active-conns'
+        ).innerText =
+            totalConnections;
+
+
+
+        /* ---------------------------------------------
+           LATENCY CHART
+        --------------------------------------------- */
+
+        latencyChart.data.labels =
+            labels;
+
+
+        latencyChart.data.datasets[0].data =
+            latencies;
+
+
+        latencyChart.update('none');
+
+
+
+        /* ---------------------------------------------
+           CONCURRENCY CHART
+        --------------------------------------------- */
+
+        concurrencyChart.data.labels =
+            labels;
+
+
+        concurrencyChart.data.datasets[0].data =
+            connections;
+
+
+        concurrencyChart.update('none');
+
+    }
+
+    catch (error) {
+
+        console.error(
+            'Backend fetch error:',
+            error
+        );
+
+    }
+
+}
+
+
+
+/* ============================================================
+   MASTER REFRESH
+============================================================ */
+
+function fetchData() {
+
+    fetchStatus();
+
+    fetchConfig();
+
+    fetchBackends();
+
+}
+
+
+
+/* ============================================================
+   SEND TEST TRAFFIC
+============================================================ */
+
+async function sendTestTraffic(count) {
+
+
+    logConsole(
+        '[TRAFFIC] Starting ' +
+        count +
+        ' requests through FlexiProxy...'
+    );
+
+
+    const startTime =
+        Date.now();
+
+
+    /*
+     * IMPORTANT:
+     *
+     * DO NOT USE:
+     *
+     * http://localhost:8080
+     *
+     * because the dashboard is running on Render.
+     *
+     * "/" means:
+     *
+     * https://flexiproxy-1j4q.onrender.com/
+     *
+     */
+
+
+    const requests = [];
+
+
+    for (
+        let i = 0;
+        i < count;
+        i++
+    ) {
+
+        requests.push(
+
+            fetch(
+                '/?traffic_test=' +
+                Date.now() +
+                '-' +
+                i,
+                {
+                    method: 'GET',
                     cache: 'no-store',
-                    ...options
+                    headers: {
+                        'Accept': 'application/json'
+                    }
                 }
-            );
-        }
+            )
+
+            .then(async function(response) {
+
+                const text =
+                    await response.text();
 
 
-        // ============================================================
-        // CHARTS
-        // ============================================================
-
-        function initCharts() {
-
-            const latencyContext =
-                document
-                    .getElementById('latencyChart')
-                    .getContext('2d');
+                let data;
 
 
-            latencyChart =
-                new Chart(
-                    latencyContext,
-                    {
+                try {
 
-                        type: 'line',
+                    data =
+                        JSON.parse(text);
 
-                        data: {
+                }
 
-                            labels: [],
+                catch {
 
-                            datasets: []
+                    data = {
+                        message: text
+                    };
 
-                        },
+                }
 
-                        options: {
 
-                            responsive: true,
+                return {
 
-                            maintainAspectRatio: false,
+                    status:
+                        response.status,
 
-                            animation: false,
+                    data:
+                        data
 
-                            scales: {
+                };
 
-                                x: {
+            })
 
-                                    grid: {
-                                        color:
-                                            'rgba(255,255,255,0.05)'
-                                    },
+            .catch(function(error) {
 
-                                    ticks: {
-                                        color: '#64748b'
-                                    }
+                return {
 
-                                },
+                    status: 0,
 
-                                y: {
+                    data: {
 
-                                    beginAtZero: true,
-
-                                    grid: {
-                                        color:
-                                            'rgba(255,255,255,0.05)'
-                                    },
-
-                                    ticks: {
-                                        color: '#64748b'
-                                    }
-
-                                }
-
-                            },
-
-                            plugins: {
-
-                                legend: {
-
-                                    labels: {
-
-                                        color: '#94a3b8'
-
-                                    }
-
-                                }
-
-                            }
-
-                        }
+                        error:
+                            error.message
 
                     }
-                );
+
+                };
+
+            })
+
+        );
+
+    }
 
 
-            const concurrencyContext =
-                document
-                    .getElementById('concurrencyChart')
-                    .getContext('2d');
+
+    const results =
+        await Promise.all(
+            requests
+        );
 
 
-            concurrencyChart =
-                new Chart(
-                    concurrencyContext,
-                    {
 
-                        type: 'doughnut',
-
-                        data: {
-
-                            labels: [],
-
-                            datasets: [
-
-                                {
-
-                                    data: [],
-
-                                    backgroundColor: [
-                                        '#38bdf8',
-                                        '#10b981',
-                                        '#8b5cf6',
-                                        '#f59e0b'
-                                    ]
-
-                                }
-
-                            ]
-
-                        },
-
-                        options: {
-
-                            responsive: true,
-
-                            maintainAspectRatio: false,
-
-                            animation: false,
-
-                            plugins: {
-
-                                legend: {
-
-                                    labels: {
-
-                                        color: '#94a3b8'
-
-                                    }
-
-                                }
-
-                            }
-
-                        }
-
-                    }
-                );
-        }
+    const distribution = {};
 
 
-        // ============================================================
-        // TAB SWITCHING
-        // ============================================================
 
-        function switchTab(tabName) {
-
-            const tabs = [
-                'overview',
-                'targets',
-                'circuit',
-                'chaos',
-                'logs',
-                'config'
-            ];
+    results.forEach(function(result) {
 
 
-            tabs.forEach(
-                function(tab) {
-
-                    const button =
-                        document.getElementById(
-                            'nav-' + tab
-                        );
+        const backend =
+            result.data.backend_id ||
+            'unknown';
 
 
-                    const panel =
-                        document.getElementById(
-                            'tab-' + tab + '-panel'
-                        );
+        distribution[backend] =
+            (
+                distribution[backend] ||
+                0
+            ) + 1;
 
 
-                    if (tab === tabName) {
 
-                        if (button) {
+        logConsole(
 
-                            button.className =
-                                'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-white bg-slate-800 border border-slate-700/60 shadow-sm';
+            '[RESPONSE] ' +
 
-                        }
+            backend +
 
-                        if (panel) {
+            ' | HTTP ' +
 
-                            panel.classList.remove(
-                                'hidden'
-                            );
+            result.status
 
-                        }
+        );
 
-                    } else {
+    });
 
-                        if (button) {
 
-                            button.className =
-                                'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/50';
 
-                        }
+    const elapsed =
+        Date.now() -
+        startTime;
 
-                        if (panel) {
 
-                            panel.classList.add(
-                                'hidden'
-                            );
 
-                        }
+    logConsole(
 
-                    }
+        '[TRAFFIC COMPLETE] ' +
 
+        count +
+
+        ' requests completed in ' +
+
+        elapsed +
+
+        ' ms'
+
+    );
+
+
+
+    logConsole(
+
+        '[LOAD BALANCING] Distribution: ' +
+
+        JSON.stringify(
+            distribution
+        )
+
+    );
+
+
+
+    /*
+     * Give backend metrics a small amount
+     * of time to update.
+     */
+
+    setTimeout(
+        function() {
+            fetchData();
+        },
+        500
+    );
+
+}
+
+
+
+/* ============================================================
+   SLOW REQUEST
+============================================================ */
+
+async function triggerSlowRequest() {
+
+
+    logConsole(
+        '[CHAOS] Sending /slow request...'
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+                '/slow?delay=2s',
+                {
+                    cache: 'no-store'
                 }
             );
 
 
-            const titles = {
+        const data =
+            await response.json();
 
-                overview:
-                    'Overview Dashboard',
 
-                targets:
-                    'Upstream Target Pool',
+        logConsole(
 
-                circuit:
-                    'Circuit Breakers Monitor',
+            '[SLOW RESPONSE] ' +
 
-                chaos:
-                    'Traffic & Chaos Control Center',
+            (
+                data.backend_id ||
+                'unknown'
+            ) +
 
-                logs:
-                    'Live Console Stream',
+            ' | Delay: ' +
 
-                config:
-                    'Runtime Configuration'
+            (
+                data.delay ||
+                '2s'
+            )
+
+        );
+
+
+        fetchData();
+
+    }
+
+    catch (error) {
+
+        logConsole(
+            '[SLOW ERROR] ' +
+            error.message
+        );
+
+    }
+
+}
+
+
+
+/* ============================================================
+   ERROR REQUEST
+============================================================ */
+
+async function triggerErrorRequest() {
+
+
+    logConsole(
+        '[CHAOS] Sending /error request...'
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+                '/error?code=500',
+                {
+                    cache: 'no-store'
+                }
+            );
+
+
+        logConsole(
+
+            '[ERROR RESPONSE] HTTP ' +
+            response.status
+
+        );
+
+
+        fetchData();
+
+    }
+
+    catch (error) {
+
+        logConsole(
+            '[ERROR] ' +
+            error.message
+        );
+
+    }
+
+}
+
+
+
+/* ============================================================
+   BACKEND FAULT
+============================================================ */
+
+async function toggleBackendFault(
+    targetAddress,
+    status
+) {
+
+
+    logConsole(
+
+        '[FAULT INJECTION] ' +
+
+        targetAddress +
+
+        ' → ' +
+
+        status
+
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+
+                targetAddress +
+                '/health?status=' +
+                status,
+
+                {
+                    method: 'POST'
+                }
+
+            );
+
+
+        const data =
+            await response.json();
+
+
+        logConsole(
+
+            '[FAULT RESULT] ' +
+
+            JSON.stringify(
+                data
+            )
+
+        );
+
+
+        fetchData();
+
+    }
+
+    catch (error) {
+
+        logConsole(
+
+            '[FAULT ERROR] ' +
+            error.message
+
+        );
+
+    }
+
+}
+
+
+
+/* ============================================================
+   PROBE
+============================================================ */
+
+async function probeBackend(address) {
+
+
+    logConsole(
+        '[PROBE] Checking ' +
+        address
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+                address +
+                '/health',
+                {
+                    cache: 'no-store'
+                }
+            );
+
+
+        logConsole(
+
+            '[PROBE RESULT] HTTP ' +
+            response.status
+
+        );
+
+    }
+
+    catch (error) {
+
+        logConsole(
+
+            '[PROBE ERROR] ' +
+            error.message
+
+        );
+
+    }
+
+}
+
+
+
+/* ============================================================
+   CONNECTION STATUS
+============================================================ */
+
+function setConnectionStatus(online) {
+
+
+    const dot =
+        document.getElementById(
+            'pulse-dot'
+        );
+
+
+    const text =
+        document.getElementById(
+            'status-text'
+        );
+
+
+    if (online) {
+
+        dot.className =
+            'w-2.5 h-2.5 rounded-full bg-emerald-500 pulse-green';
+
+        text.innerText =
+            'Operational';
+
+        text.className =
+            'text-xs font-bold text-slate-200';
+
+    }
+
+    else {
+
+        dot.className =
+            'w-2.5 h-2.5 rounded-full bg-rose-500';
+
+        text.innerText =
+            'Connection Error';
+
+        text.className =
+            'text-xs font-bold text-rose-400';
+
+    }
+
+}
+
+
+
+/* ============================================================
+   CONSOLE LOG
+============================================================ */
+
+function logConsole(message) {
+
+
+    const consoleBox =
+        document.getElementById(
+            'console-stream'
+        );
+
+
+    const time =
+        new Date().toLocaleTimeString();
+
+
+    const div =
+        document.createElement(
+            'div'
+        );
+
+
+    div.className =
+        'text-slate-300';
+
+
+    div.innerHTML =
+
+        '<span class="text-slate-500">' +
+
+        '[' +
+        time +
+        '] ' +
+
+        '</span>' +
+
+        message;
+
+
+    consoleBox.appendChild(
+        div
+    );
+
+
+    consoleBox.scrollTop =
+        consoleBox.scrollHeight;
+
+}
+
+
+
+/* ============================================================
+   SERVER-SENT EVENTS
+============================================================ */
+
+function startEventStream() {
+
+
+    try {
+
+        const eventSource =
+            new EventSource(
+                '/api/v1/events'
+            );
+
+
+        eventSource.onopen =
+            function() {
+
+                setConnectionStatus(
+                    true
+                );
+
+
+                logConsole(
+                    '[SSE] Live event stream connected.'
+                );
 
             };
 
 
-            document.getElementById(
-                'page-title'
-            ).innerText =
-                titles[tabName] ||
-                'Dashboard';
+        eventSource.onmessage =
+            function(event) {
 
-        }
+                /*
+                 * Backend events trigger
+                 * immediate dashboard refresh.
+                 */
 
-
-        // ============================================================
-        // LIVE DATA
-        // ============================================================
-
-        async function fetchData() {
-
-            if (updateInProgress) {
-                return;
-            }
-
-
-            updateInProgress = true;
-
-
-            try {
-
-                // ----------------------------------------------------
-                // STATUS
-                // ----------------------------------------------------
-
-                const statusResponse =
-                    await apiFetch(
-                        '/api/v1/status'
-                    );
-
-
-                if (!statusResponse.ok) {
-
-                    throw new Error(
-                        'Status API HTTP ' +
-                        statusResponse.status
-                    );
-
-                }
-
-
-                const status =
-                    await statusResponse.json();
-
-
-                document.getElementById(
-                    'kpi-healthy-ratio'
-                ).innerText =
-                    `${status.backends_healthy} / ${status.backends_total}`;
-
-
-                document.getElementById(
-                    'kpi-algorithm'
-                ).innerText =
-                    status.load_balancer_algorithm;
-
-
-                // ----------------------------------------------------
-                // CONFIG
-                // ----------------------------------------------------
-
-                const configResponse =
-                    await apiFetch(
-                        '/api/v1/config'
-                    );
-
-
-                if (configResponse.ok) {
-
-                    const config =
-                        await configResponse.json();
-
-
-                    document.getElementById(
-                        'config-code-block'
-                    ).innerText =
-                        JSON.stringify(
-                            config,
-                            null,
-                            2
-                        );
-
-                }
-
-
-                // ----------------------------------------------------
-                // BACKENDS
-                // ----------------------------------------------------
-
-                const backendResponse =
-                    await apiFetch(
-                        '/api/v1/backends'
-                    );
-
-
-                if (!backendResponse.ok) {
-
-                    throw new Error(
-                        'Backend API HTTP ' +
-                        backendResponse.status
-                    );
-
-                }
-
-
-                const backends =
-                    await backendResponse.json();
-
-
-                let totalRequests = 0;
-
-                let totalConnections = 0;
-
-
-                const labels = [];
-
-                const latencies = [];
-
-                const connections = [];
-
-
-                const overview =
-                    document.getElementById(
-                        'overview-tbody'
-                    );
-
-
-                const targets =
-                    document.getElementById(
-                        'targets-tbody'
-                    );
-
-
-                const circuits =
-                    document.getElementById(
-                        'circuit-tbody'
-                    );
-
-
-                overview.innerHTML = '';
-
-                targets.innerHTML = '';
-
-                circuits.innerHTML = '';
-
-
-                // ----------------------------------------------------
-                // PROCESS BACKENDS
-                // ----------------------------------------------------
-
-                backends.forEach(
-                    function(backend) {
-
-                        const requestCount =
-                            Number(
-                                backend.total_reqs || 0
-                            );
-
-
-                        const activeConnections =
-                            Number(
-                                backend.active_conns || 0
-                            );
-
-
-                        totalRequests +=
-                            requestCount;
-
-
-                        totalConnections +=
-                            activeConnections;
-
-
-                        labels.push(
-                            backend.id
-                        );
-
-
-                        // IMPORTANT:
-                        // API sends latency_ms
-                        const latency =
-                            Number(
-                                backend.latency_ms || 0
-                            );
-
-
-                        const latencyDisplay =
-                            latency.toFixed(2);
-
-
-                        latencies.push(
-                            latency
-                        );
-
-
-                        connections.push(
-                            activeConnections
-                        );
-
-
-                        const healthy =
-                            Boolean(
-                                backend.healthy
-                            );
-
-
-                        const healthTag =
-                            healthy
-
-                            ?
-
-                            `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                UP
-                            </span>`
-
-                            :
-
-                            `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                                DOWN
-                            </span>`;
-
-
-                        const state =
-                            Number(
-                                backend.circuit_state || 0
-                            );
-
-
-                        let circuitTag;
-
-
-                        if (state === 1) {
-
-                            circuitTag =
-                                `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                                    OPEN
-                                </span>`;
-
-                        }
-
-                        else if (state === 2) {
-
-                            circuitTag =
-                                `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                                    HALF_OPEN
-                                </span>`;
-
-                        }
-
-                        else {
-
-                            circuitTag =
-                                `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                    CLOSED
-                                </span>`;
-
-                        }
-
-
-                        // ------------------------------------------------
-                        // OVERVIEW
-                        // ------------------------------------------------
-
-                        overview.innerHTML += `
-
-                            <tr>
-
-                                <td class="code-font font-bold text-sky-400">
-                                    ${backend.id}
-                                </td>
-
-                                <td class="code-font text-slate-300">
-                                    ${backend.address}
-                                </td>
-
-                                <td>
-                                    ${healthTag}
-                                </td>
-
-                                <td>
-                                    ${circuitTag}
-                                </td>
-
-                                <td class="code-font">
-                                    ${latencyDisplay} ms
-                                </td>
-
-                                <td class="code-font">
-                                    ${activeConnections}
-                                </td>
-
-                                <td class="code-font">
-                                    ${requestCount}
-                                </td>
-
-                            </tr>
-
-                        `;
-
-
-                        // ------------------------------------------------
-                        // TARGETS
-                        // ------------------------------------------------
-
-                        targets.innerHTML += `
-
-                            <tr>
-
-                                <td class="code-font font-bold text-sky-400">
-                                    ${backend.id}
-                                </td>
-
-                                <td class="code-font text-slate-300">
-                                    ${backend.address}
-                                </td>
-
-                                <td class="code-font">
-                                    ${backend.weight || 1}
-                                </td>
-
-                                <td>
-                                    ${healthTag}
-                                </td>
-
-                                <td class="code-font">
-                                    ${latencyDisplay} ms
-                                </td>
-
-                                <td class="code-font">
-                                    ${activeConnections}
-                                </td>
-
-                                <td class="code-font">
-                                    ${requestCount}
-                                </td>
-
-                                <td>
-
-                                    <button
-                                        onclick="probeBackend('${backend.address}')"
-                                        class="px-2.5 py-1 text-xs font-semibold rounded bg-slate-800 text-sky-400 border border-sky-500/20 hover:bg-slate-700"
-                                    >
-                                        Probe
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-                        `;
-
-
-                        // ------------------------------------------------
-                        // CIRCUIT BREAKERS
-                        // ------------------------------------------------
-
-                        circuits.innerHTML += `
-
-                            <tr>
-
-                                <td class="code-font font-bold text-sky-400">
-                                    ${backend.id}
-                                </td>
-
-                                <td class="code-font text-slate-300">
-                                    ${backend.address}
-                                </td>
-
-                                <td>
-                                    ${circuitTag}
-                                </td>
-
-                                <td>
-                                    ${healthTag}
-                                </td>
-
-                                <td class="code-font">
-                                    ${backend.failed_reqs || 0}
-                                </td>
-
-                                <td class="code-font text-slate-400">
-                                    5 consecutive
-                                </td>
-
-                            </tr>
-
-                        `;
-
-                    }
-                );
-
-
-                // ----------------------------------------------------
-                // KPIs
-                // ----------------------------------------------------
-
-                document.getElementById(
-                    'kpi-total-reqs'
-                ).innerText =
-                    totalRequests;
-
-
-                document.getElementById(
-                    'kpi-active-conns'
-                ).innerText =
-                    totalConnections;
-
-
-                // ----------------------------------------------------
-                // LATENCY CHART
-                // ----------------------------------------------------
-
-                latencyChart.data.labels =
-                    labels;
-
-
-                latencyChart.data.datasets = [
-
-                    {
-
-                        label:
-                            'Latency (ms)',
-
-                        data:
-                            latencies,
-
-                        borderColor:
-                            '#38bdf8',
-
-                        backgroundColor:
-                            'rgba(56, 189, 248, 0.1)',
-
-                        fill:
-                            true,
-
-                        tension:
-                            0.3
-
-                    }
-
-                ];
-
-
-                latencyChart.update(
-                    'none'
-                );
-
-
-                // ----------------------------------------------------
-                // CONCURRENCY CHART
-                // ----------------------------------------------------
-
-                concurrencyChart.data.labels =
-                    labels;
-
-
-                concurrencyChart.data.datasets[0].data =
-                    connections;
-
-
-                concurrencyChart.update(
-                    'none'
-                );
-
-
-                // ----------------------------------------------------
-                // ONLINE STATUS
-                // ----------------------------------------------------
-
-                document.getElementById(
-                    'pulse-dot'
-                ).className =
-                    'w-2.5 h-2.5 rounded-full bg-emerald-500 pulse-green';
-
-
-                document.getElementById(
-                    'status-text'
-                ).innerText =
-                    'Operational';
-
-            }
-
-
-            catch (error) {
-
-                console.error(
-                    'FlexiProxy live update failed:',
-                    error
-                );
-
-
-                document.getElementById(
-                    'pulse-dot'
-                ).className =
-                    'w-2.5 h-2.5 rounded-full bg-rose-500';
-
-
-                document.getElementById(
-                    'status-text'
-                ).innerText =
-                    'Connection Error';
-
-            }
-
-
-            finally {
-
-                updateInProgress = false;
-
-            }
-
-        }
-
-
-        // ============================================================
-        // TEST TRAFFIC
-        // ============================================================
-
-        function sendTestTraffic(count) {
-
-            logConsole(
-                `Initiating ${count} test requests through FlexiProxy...`
-            );
-
-
-            for (
-                let i = 0;
-                i < count;
-                i++
-            ) {
-
-                apiFetch(
-                    '/api/test'
-                )
-
-                .then(
-                    function(response) {
-
-                        if (!response.ok) {
-
-                            throw new Error(
-                                'HTTP ' +
-                                response.status
-                            );
-
-                        }
-
-                        return response.json();
-
-                    }
-                )
-
-                .then(
-                    function(data) {
-
-                        logConsole(
-                            `[Response] Routed to ${data.backend_id} | Request #${data.request_count}`
-                        );
-
-
-                        // Immediately update
-                        fetchData();
-
-                    }
-                )
-
-                .catch(
-                    function(error) {
-
-                        logConsole(
-                            `[Error] ${error.message}`
-                        );
-
-                    }
-                );
-
-            }
-
-        }
-
-
-        // ============================================================
-        // SLOW REQUEST
-        // ============================================================
-
-        function triggerSlowRequest() {
-
-            logConsole(
-                'Sending /slow request...'
-            );
-
-
-            apiFetch(
-                '/slow?delay=2s'
-            )
-
-            .then(
-                function(response) {
-
-                    if (!response.ok) {
-
-                        throw new Error(
-                            'HTTP ' +
-                            response.status
-                        );
-
-                    }
-
-                    return response.json();
-
-                }
-            )
-
-            .then(
-                function(data) {
-
-                    logConsole(
-                        `[Slow Response] ${data.backend_id} responded after ${data.delay}`
-                    );
-
-
-                    fetchData();
-
-                }
-            )
-
-            .catch(
-                function(error) {
-
-                    logConsole(
-                        `[Slow Error] ${error.message}`
-                    );
-
-                }
-            );
-
-        }
-
-
-        // ============================================================
-        // ERROR REQUEST
-        // ============================================================
-
-        function triggerErrorRequest() {
-
-            logConsole(
-                'Sending /error request...'
-            );
-
-
-            apiFetch(
-                '/error?code=500'
-            )
-
-            .then(
-                function(response) {
-
-                    logConsole(
-                        `[Error Response] HTTP ${response.status}`
-                    );
-
-
-                    fetchData();
-
-                }
-            )
-
-            .catch(
-                function(error) {
-
-                    logConsole(
-                        `[Error Request Failed] ${error.message}`
-                    );
-
-                }
-            );
-
-        }
-
-
-        // ============================================================
-        // PROBE BACKEND
-        // ============================================================
-
-        function probeBackend(address) {
-
-            logConsole(
-                `Probing ${address}/health...`
-            );
-
-
-            fetch(
-                address + '/health',
-                {
-                    cache: 'no-store'
-                }
-            )
-
-            .then(
-                function(response) {
-
-                    return response.text();
-
-                }
-            )
-
-            .then(
-                function(result) {
-
-                    logConsole(
-                        `[Probe Result] ${result}`
-                    );
-
-                }
-            )
-
-            .catch(
-                function(error) {
-
-                    logConsole(
-                        `[Probe Error] ${error.message}`
-                    );
-
-                }
-            );
-
-        }
-
-
-        // ============================================================
-        // CONSOLE
-        // ============================================================
-
-        function logConsole(message) {
-
-            const box =
-                document.getElementById(
-                    'console-stream'
-                );
-
-
-            const time =
-                new Date().toLocaleTimeString();
-
-
-            const line =
-                document.createElement(
-                    'div'
-                );
-
-
-            line.className =
-                'text-slate-300';
-
-
-            line.innerHTML =
-                `<span class="text-slate-500">[${time}]</span> ${message}`;
-
-
-            box.appendChild(
-                line
-            );
-
-
-            box.scrollTop =
-                box.scrollHeight;
-
-        }
-
-
-        // ============================================================
-        // START DASHBOARD
-        // ============================================================
-
-        document.addEventListener(
-            'DOMContentLoaded',
-            function() {
-
-                // Initialize charts
-                initCharts();
-
-
-                // First API request
                 fetchData();
 
-
-                // ----------------------------------------------------
-                // SERVER-SENT EVENTS
-                // ----------------------------------------------------
-
-                let eventSource;
+            };
 
 
-                function connectSSE() {
+        eventSource.onerror =
+            function() {
 
-                    try {
-
-                        eventSource =
-                            new EventSource(
-                                '/api/v1/events'
-                            );
-
-
-                        eventSource.onopen =
-                            function() {
-
-                                document.getElementById(
-                                    'pulse-dot'
-                                ).className =
-                                    'w-2.5 h-2.5 rounded-full bg-emerald-500 pulse-green';
-
-
-                                document.getElementById(
-                                    'status-text'
-                                ).innerText =
-                                    'Operational';
-
-                            };
-
-
-                        eventSource.onmessage =
-                            function() {
-
-                                fetchData();
-
-                            };
-
-
-                        eventSource.onerror =
-                            function() {
-
-                                document.getElementById(
-                                    'pulse-dot'
-                                ).className =
-                                    'w-2.5 h-2.5 rounded-full bg-amber-500';
-
-
-                                document.getElementById(
-                                    'status-text'
-                                ).innerText =
-                                    'Reconnecting...';
-
-
-                                eventSource.close();
-
-
-                                setTimeout(
-                                    connectSSE,
-                                    3000
-                                );
-
-                            };
-
-                    }
-
-                    catch (error) {
-
-                        console.error(
-                            'SSE error:',
-                            error
-                        );
-
-                    }
-
-                }
-
-
-                connectSSE();
-
-
-                // ----------------------------------------------------
-                // GUARANTEED AUTO REFRESH
-                // ----------------------------------------------------
-
-                setInterval(
-                    function() {
-
-                        fetchData();
-
-                    },
-                    1500
+                setConnectionStatus(
+                    false
                 );
 
+            };
 
-                // ----------------------------------------------------
-                // CONSOLE MESSAGE
-                // ----------------------------------------------------
+    }
 
-                logConsole(
-                    'Live monitoring started.'
-                );
+    catch (error) {
 
-
-                logConsole(
-                    'Dashboard polling interval: 1.5 seconds.'
-                );
-
-
-                logConsole(
-                    'Connected to FlexiProxy API.'
-                );
-
-            }
+        console.error(
+            'SSE error:',
+            error
         );
 
-    </script>
+    }
+
+}
+
+
+
+/* ============================================================
+   INITIALIZATION
+============================================================ */
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function() {
+
+
+        initCharts();
+
+
+        fetchData();
+
+
+        startEventStream();
+
+
+        /*
+         * Automatic polling.
+         *
+         * This means the user does NOT
+         * need to refresh the browser.
+         */
+
+        setInterval(
+            fetchData,
+            1500
+        );
+
+
+        logConsole(
+            '[SYSTEM] FlexiProxy dashboard connected.'
+        );
+
+
+        logConsole(
+            '[SYSTEM] Automatic monitoring enabled.'
+        );
+
+
+        logConsole(
+            '[SYSTEM] Cloud proxy: ' +
+            window.location.origin
+        );
+
+    }
+);
+
+</script>
+
 
 </body>
 

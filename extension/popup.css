@@ -1,0 +1,294 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  width: 430px;
+  min-height: 600px;
+  background: #0b1020;
+  color: #edf2ff;
+  font-family: Inter, Arial, sans-serif;
+}
+
+button {
+  font: inherit;
+}
+
+.app {
+  padding: 18px;
+}
+
+.topbar,
+.section-title,
+footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+.subtitle,
+.muted,
+small {
+  color: #8994ad;
+}
+
+.subtitle {
+  margin-top: 3px;
+  font-size: 11px;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .5px;
+}
+
+.badge.online {
+  color: #75e6a2;
+  background: rgba(54, 211, 119, .12);
+}
+
+.badge.offline {
+  color: #ff7c88;
+  background: rgba(255, 82, 99, .12);
+}
+
+.badge.connecting {
+  color: #ffd36b;
+  background: rgba(255, 193, 7, .12);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.hero {
+  margin-top: 16px;
+  padding: 20px;
+  border: 1px solid #202a43;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #121a30, #0e1528);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.eyebrow,
+.label {
+  font-size: 10px;
+  color: #7f8aa5;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.hero-status {
+  margin-top: 5px;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.pulse-ring {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid #2d3a5c;
+}
+
+.pulse-ring span {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffd166;
+  box-shadow: 0 0 18px rgba(255, 209, 102, .55);
+}
+
+.pulse-ring.online span {
+  background: #39d98a;
+  box-shadow: 0 0 18px rgba(57, 217, 138, .6);
+}
+
+.pulse-ring.offline span {
+  background: #ff5364;
+  box-shadow: 0 0 18px rgba(255, 83, 100, .6);
+}
+
+.stats {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.stat-card {
+  padding: 13px;
+  min-height: 83px;
+  border: 1px solid #202a43;
+  border-radius: 14px;
+  background: #11182b;
+}
+
+.stat-card strong {
+  display: block;
+  margin-top: 7px;
+  font-size: 19px;
+  line-height: 1;
+  text-transform: capitalize;
+}
+
+.stat-card small {
+  display: block;
+  margin-top: 7px;
+  font-size: 10px;
+}
+
+.section {
+  margin-top: 18px;
+}
+
+.section.compact {
+  margin-top: 15px;
+}
+
+.section-title h2 {
+  margin: 0;
+  font-size: 13px;
+}
+
+.section-title .muted {
+  font-size: 10px;
+}
+
+.backends,
+.breakers {
+  margin-top: 9px;
+  display: grid;
+  gap: 7px;
+}
+
+.backend,
+.breaker {
+  padding: 11px 12px;
+  border: 1px solid #202a43;
+  border-radius: 12px;
+  background: #11182b;
+}
+
+.backend {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.backend-name {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.backend-address {
+  margin-top: 4px;
+  color: #707b95;
+  font-size: 10px;
+}
+
+.status {
+  padding: 5px 8px;
+  border-radius: 7px;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.status.healthy,
+.breaker.closed {
+  color: #73e3a1;
+  background: rgba(54, 211, 119, .1);
+}
+
+.status.unhealthy,
+.breaker.open {
+  color: #ff7180;
+  background: rgba(255, 82, 99, .1);
+}
+
+.breaker.half_open {
+  color: #ffd166;
+  background: rgba(255, 209, 102, .1);
+}
+
+.breaker {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.breaker-name {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.breaker-state {
+  padding: 5px 8px;
+  border-radius: 7px;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.alert {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: #ffb8bf;
+  background: rgba(255, 82, 99, .1);
+  border: 1px solid rgba(255, 82, 99, .2);
+  font-size: 11px;
+}
+
+.hidden {
+  display: none;
+}
+
+.empty {
+  padding: 14px;
+  text-align: center;
+  border: 1px dashed #26314e;
+  border-radius: 10px;
+  color: #707b95;
+  font-size: 11px;
+}
+
+footer {
+  margin-top: 17px;
+  padding-top: 12px;
+  border-top: 1px solid #202a43;
+  color: #65718c;
+  font-size: 9px;
+}
+
+#refreshBtn {
+  border: 1px solid #2b3859;
+  border-radius: 7px;
+  background: #151f36;
+  color: #cdd6ec;
+  padding: 5px 9px;
+  cursor: pointer;
+}
+
+#refreshBtn:hover {
+  background: #1c2945;
+}

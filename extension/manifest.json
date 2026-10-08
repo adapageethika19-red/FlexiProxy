@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "FlexiProxy Monitor",
+  "version": "1.0.0",
+  "description": "Real-time monitoring dashboard for FlexiProxy.",
+  "permissions": [],
+  "host_permissions": [
+    "http://localhost:8081/*",
+    "http://127.0.0.1:8081/*"
+  ],
+  "action": {
+    "default_title": "FlexiProxy Monitor",
+    "default_popup": "popup.html"
+  }
+}

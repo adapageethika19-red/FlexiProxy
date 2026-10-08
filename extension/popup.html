@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlexiProxy Monitor</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <div class="brand">FlexiProxy</div>
+        <div class="subtitle">Real-Time Proxy Monitor</div>
+      </div>
+      <div id="connectionBadge" class="badge connecting">
+        <span class="dot"></span>
+        CONNECTING
+      </div>
+    </header>
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow">PROXY STATUS</div>
+        <div id="proxyStatus" class="hero-status">Checking...</div>
+        <div id="lastUpdated" class="muted">Waiting for FlexiProxy...</div>
+      </div>
+      <div class="pulse-ring">
+        <span id="heroDot"></span>
+      </div>
+    </section>
+
+    <section class="stats">
+      <article class="stat-card">
+        <span class="label">Healthy</span>
+        <strong id="healthyCount">—</strong>
+        <small id="backendTotal">/ — backends</small>
+      </article>
+
+      <article class="stat-card">
+        <span class="label">Algorithm</span>
+        <strong id="algorithm">—</strong>
+        <small>Load balancing</small>
+      </article>
+
+      <article class="stat-card">
+        <span class="label">Uptime</span>
+        <strong id="uptime">—</strong>
+        <small>Proxy runtime</small>
+      </article>
+
+      <article class="stat-card">
+        <span class="label">CPU</span>
+        <strong id="cpu">—</strong>
+        <small>System cores: <span id="cpuCores">—</span></small>
+      </article>
+    </section>
+
+    <section class="section">
+      <div class="section-title">
+        <h2>Backend Servers</h2>
+        <span id="backendSummary" class="muted">—</span>
+      </div>
+      <div id="backends" class="backends">
+        <div class="empty">Loading backends...</div>
+      </div>
+    </section>
+
+    <section class="section compact">
+      <div class="section-title">
+        <h2>Circuit Breakers</h2>
+        <span id="breakerSummary" class="muted">—</span>
+      </div>
+      <div id="breakers" class="breakers">
+        <div class="empty">Loading...</div>
+      </div>
+    </section>
+
+    <div id="alert" class="alert hidden"></div>
+
+    <footer>
+      <span>FlexiProxy Admin API</span>
+      <button id="refreshBtn">Refresh</button>
+    </footer>
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>
